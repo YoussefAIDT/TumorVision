@@ -5,4 +5,7 @@ matplotlib
 scikit-learn
 plotly
 opencv-python
-
+Pillow
+requests
+ultralytics
+tensorflow
