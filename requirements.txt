@@ -5,6 +5,4 @@ matplotlib
 scikit-learn
 plotly
 cv2
-sqlite3
-datetime
-json
+
