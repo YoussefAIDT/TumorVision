@@ -4,5 +4,5 @@ numpy
 matplotlib
 scikit-learn
 plotly
-cv2
+opencv-python
 
