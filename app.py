@@ -434,25 +434,22 @@ def load_models_safely():
         'yolo': None
     }
 
-    # Exemple : fichier à télécharger depuis Drive pour cnn_binary
-    drive_id_cnn_binary = '1anPhS8VhKIEp0C7x_EQJODjNKkEiCQgj'
-    local_path_cnn_binary = 'final_brain_tumor_model.h5'
-    url_cnn_binary = f'https://drive.google.com/uc?id={drive_id_cnn_binary}'
-
+    # Chargement du modèle CNN binaire local
     try:
-        # Vérifie si le fichier existe déjà localement, sinon téléchargement
-        if not os.path.exists(local_path_cnn_binary):
-            st.sidebar.info(f"Téléchargement du modèle CNN binaire depuis Drive...")
-            gdown.download(url_cnn_binary, local_path_cnn_binary, quiet=False)
-        # Chargement du modèle
-        models['cnn_binary'] = tf.keras.models.load_model(local_path_cnn_binary)
+        models['cnn_binary'] = tf.keras.models.load_model('final_brain_tumor_model.h5')
         st.sidebar.success("✅ Modèle CNN binaire chargé")
     except Exception as e:
         st.sidebar.warning(f"⚠️ Modèle CNN binaire non disponible: {str(e)}")
 
-    # Exemple de chargement d'un autre modèle (local ou Drive)
+    # Téléchargement et chargement du classificateur CNN depuis Google Drive
+    drive_id_cnn_classifier = '1anPhS8VhKIEp0C7x_EQJODjNKkEiCQgj'
+    local_path_cnn_classifier = 'best_model.h5'
+    url_cnn_classifier = f'https://drive.google.com/uc?id={drive_id_cnn_classifier}'
+
     try:
-        local_path_cnn_classifier = '/content/drive/MyDrive/brain_tumor/best_model.h5'
+        if not os.path.exists(local_path_cnn_classifier):
+            st.sidebar.info("Téléchargement du Classificateur CNN depuis Drive...")
+            gdown.download(url_cnn_classifier, local_path_cnn_classifier, quiet=False)
         models['cnn_classifier'] = tf.keras.models.load_model(local_path_cnn_classifier)
         st.sidebar.success("✅ Classificateur CNN chargé")
     except Exception as e:
@@ -467,6 +464,7 @@ def load_models_safely():
         st.sidebar.warning(f"⚠️ Modèle YOLO non disponible: {str(e)}")
 
     return models
+
 
 
 def preprocess_image_with_original_size(img, target_size=(224, 224)):
