@@ -1,11 +1,6 @@
 streamlit
-pandas
-numpy
-matplotlib
-scikit-learn
-plotly
 opencv-python-headless
-Pillow
-requests
-ultralytics
+gdown
 tensorflow
+ultralytics
+plotly
