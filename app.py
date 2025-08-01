@@ -421,43 +421,53 @@ import time
 # Configuration des étiquettes des tumeurs
 TUMOR_LABELS = ['Gliome', 'Méningiome', 'Hypophysaire']
 
+
+import gdown
+import tensorflow as tf
+
 def load_models_safely():
-    """Chargement sécurisé des modèles avec gestion d'erreurs"""
+    """Chargement sécurisé des modèles avec téléchargement depuis Google Drive si besoin"""
+
     models = {
         'cnn_binary': None,
         'cnn_classifier': None,
         'yolo': None
     }
 
+    # Exemple : fichier à télécharger depuis Drive pour cnn_binary
+    drive_id_cnn_binary = '1anPhS8VhKIEp0C7x_EQJODjNKkEiCQgj'
+    local_path_cnn_binary = 'final_brain_tumor_model.h5'
+    url_cnn_binary = f'https://drive.google.com/uc?id={drive_id_cnn_binary}'
+
     try:
-        # Tentative de chargement du modèle CNN binaire
-        try:
-            import tensorflow as tf
-            models['cnn_binary'] = tf.keras.models.load_model('final_brain_tumor_model.h5')
-            st.sidebar.success("✅ Modèle CNN binaire chargé")
-        except Exception as e:
-            st.sidebar.warning(f"⚠️ Modèle CNN binaire non disponible: {str(e)}")
+        # Vérifie si le fichier existe déjà localement, sinon téléchargement
+        if not os.path.exists(local_path_cnn_binary):
+            st.sidebar.info(f"Téléchargement du modèle CNN binaire depuis Drive...")
+            gdown.download(url_cnn_binary, local_path_cnn_binary, quiet=False)
+        # Chargement du modèle
+        models['cnn_binary'] = tf.keras.models.load_model(local_path_cnn_binary)
+        st.sidebar.success("✅ Modèle CNN binaire chargé")
+    except Exception as e:
+        st.sidebar.warning(f"⚠️ Modèle CNN binaire non disponible: {str(e)}")
 
-        # Tentative de chargement du classificateur CNN (depuis Google Drive)
-        try:
-            import tensorflow as tf
-            models['cnn_classifier'] = tf.keras.models.load_model('best_model.h5')
-            st.sidebar.success("✅ Classificateur CNN chargé")
-        except Exception as e:
-            st.sidebar.warning(f"⚠️ Classificateur CNN non disponible: {str(e)}")
+    # Exemple de chargement d'un autre modèle (local ou Drive)
+    try:
+        local_path_cnn_classifier = '/content/drive/MyDrive/brain_tumor/best_model.h5'
+        models['cnn_classifier'] = tf.keras.models.load_model(local_path_cnn_classifier)
+        st.sidebar.success("✅ Classificateur CNN chargé")
+    except Exception as e:
+        st.sidebar.warning(f"⚠️ Classificateur CNN non disponible: {str(e)}")
 
-        # Tentative de chargement du modèle YOLO
-        try:
-            from ultralytics import YOLO
-            models['yolo'] = YOLO('best (3).pt')
-            st.sidebar.success("✅ Modèle YOLO chargé")
-        except Exception as e:
-            st.sidebar.warning(f"⚠️ Modèle YOLO non disponible: {str(e)}")
-
-    except ImportError as e:
-        st.sidebar.error(f"❌ Erreur d'importation: {str(e)}")
+    # Chargement du modèle YOLO
+    try:
+        from ultralytics import YOLO
+        models['yolo'] = YOLO('best (3).pt')
+        st.sidebar.success("✅ Modèle YOLO chargé")
+    except Exception as e:
+        st.sidebar.warning(f"⚠️ Modèle YOLO non disponible: {str(e)}")
 
     return models
+
 
 def preprocess_image_with_original_size(img, target_size=(224, 224)):
     """Préprocessing avec sauvegarde de la taille originale"""
